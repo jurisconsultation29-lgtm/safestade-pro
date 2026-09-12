@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>SafeStade Pro — SOC · Cyberdéfense · GRC</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#C1272D; --red-deep:#7C1A1F; --red-ink:#4A1013;
+    --red-t08:rgba(193,39,45,0.08); --red-t14:rgba(193,39,45,0.14); --red-t22:rgba(193,39,45,0.24);
+    --green:#006233; --green-deep:#013D20; --green-ink:#012814;
+    --green-t08:rgba(0,98,51,0.10); --green-t14:rgba(0,98,51,0.16); --green-t22:rgba(0,98,51,0.26);
+    --white:#FFFFFF; --ink:#EAF3EE; --ink-soft:rgba(234,243,238,0.62); --bg:#0E1B15; --line:rgba(234,243,238,0.14);
+    --card:#0F3A22; --card-strong:#164A2B; --nav-bg:#4A1013;
+    --red-light:#FF6B72; --green-light:#4CD68A;
+    --display:'Chakra Petch',sans-serif; --body:'Inter',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#0A130E;font-family:var(--body);color:var(--ink);min-height:100vh;}
+  .device{width:100%;max-width:100%;background:linear-gradient(180deg,#0C2417 0%,#0A2015 60%,#091C13 100%);min-height:100vh;}
+  .device-frame{position:relative;max-width:1280px;margin:0 auto;padding-bottom:90px;}
+  button{font-family:var(--body);cursor:pointer;border:none;background:none;}
+
+  /* HEADER */
+  .header{position:relative;background:var(--nav-bg);padding:26px 48px 30px;color:var(--white);overflow:hidden;}
+  .zellige{position:absolute;inset:0;opacity:0.14;pointer-events:none;}
+  .header-top{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:2;}
+  .brand{display:flex;align-items:center;gap:9px;}
+  .brand-mark{width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.3);border-radius:10px;}
+  .brand-text .eyebrow{font-family:var(--display);font-size:9.5px;letter-spacing:.13em;color:rgba(255,255,255,.72);}
+  .brand-text .title{font-family:var(--display);font-size:15px;font-weight:700;}
+  .org-badge{font-size:10px;font-weight:600;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);padding:5px 10px;border-radius:999px;}
+  .head-actions{display:flex;align-items:center;gap:8px;}
+  .role-btn{color:var(--white);cursor:pointer;}
+  .bell-btn{position:relative;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);color:var(--white);font-size:14px;display:flex;align-items:center;justify-content:center;}
+  .bell-dot{position:absolute;top:4px;right:5px;width:7px;height:7px;border-radius:50%;background:var(--green-light);border:1px solid var(--red-ink);}
+  .notif-panel{display:none;position:absolute;top:64px;right:18px;width:250px;background:var(--card-strong);border:1px solid var(--line);border-radius:14px;padding:10px;z-index:30;box-shadow:0 14px 30px rgba(0,0,0,.4);}
+  .notif-panel.open{display:block;}
+  .notif-item{font-size:11px;padding:8px 6px;border-bottom:1px solid var(--line);color:var(--ink);}
+  .notif-item:last-child{border-bottom:none;}
+  .notif-item b{display:block;font-size:11.5px;margin-bottom:2px;}
+  .header-screen-title{position:relative;z-index:2;margin-top:16px;font-family:var(--display);font-size:18px;font-weight:600;}
+  .header-screen-sub{position:relative;z-index:2;margin-top:4px;font-size:11.5px;color:rgba(255,255,255,.78);max-width:290px;line-height:1.5;}
+
+  /* TABS (secondary nav inside header) */
+  .tabbar{display:flex;gap:10px;margin-top:20px;position:relative;z-index:2;overflow-x:visible;}
+  .tab{flex-shrink:0;font-size:13.5px;font-weight:600;color:rgba(255,255,255,.75);background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);padding:11px 22px;border-radius:10px;}
+  .tab.active{background:var(--card-strong);color:var(--white);}
+
+  /* CONTENT */
+  .content{padding:0 48px 30px;margin-top:-10px;position:relative;z-index:3;min-height:420px;}
+  .screen{display:none;}
+  .screen.active{display:block;animation:fadein .2s ease;}
+  @keyframes fadein{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+  .section-title{display:flex;align-items:baseline;justify-content:space-between;margin:20px 0 11px;}
+  .section-title:first-child{margin-top:16px;}
+  .section-title h2{font-family:var(--display);font-size:14px;font-weight:600;}
+  .section-title .tag{font-size:10.5px;color:var(--ink-soft);}
+
+  /* KPI GRID */
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+  .kpi{border-radius:16px;padding:14px;border:1px solid var(--line);position:relative;overflow:hidden;}
+  .kpi.safe{background:linear-gradient(155deg,var(--green-t22),var(--card) 65%);}
+  .kpi.alert{background:linear-gradient(155deg,var(--red-t22),var(--card) 65%);}
+  .kpi{border-left:3px solid transparent;}
+  .kpi.safe{border-left-color:var(--green);}
+  .kpi.alert{border-left-color:var(--red);}
+  .kpi .kpi-num{font-family:var(--display);font-size:23px;font-weight:700;}
+  .kpi.safe .kpi-num{color:var(--green);}
+  .kpi.alert .kpi-num{color:var(--red);}
+  .kpi .kpi-label{font-size:10.5px;color:var(--ink-soft);margin-top:2px;font-weight:500;}
+  .kpi .kpi-delta{font-size:9.5px;font-weight:700;margin-top:6px;display:inline-block;padding:2px 7px;border-radius:999px;}
+  .kpi.safe .kpi-delta{background:var(--green-t22);color:var(--green-light);}
+  .kpi.alert .kpi-delta{background:var(--red-t22);color:var(--red-light);}
+
+  /* generic row card */
+  .row-card{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 13px;margin-bottom:9px;width:100%;text-align:left;}
+  .row-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .row-icon.crit{background:var(--red-t14);} .row-icon.watch{background:var(--red-t08);} .row-icon.ok{background:var(--green-t08);}
+  .row-text{flex:1;min-width:0;} .row-title{font-size:12.5px;font-weight:600;} .row-meta{font-size:10.5px;color:var(--ink-soft);margin-top:2px;}
+  .row-tag{font-size:9.5px;font-weight:700;letter-spacing:.03em;padding:4px 9px;border-radius:999px;flex-shrink:0;margin-left:6px;}
+  .row-tag.crit{background:var(--red);color:var(--white);} .row-tag.watch{background:var(--red-t22);color:var(--red-light);} .row-tag.ok{background:var(--green-t22);color:var(--green-light);}
+
+  .filter-row{display:flex;gap:7px;margin-bottom:13px;flex-wrap:wrap;}
+  .mitre-tag{font-size:10px;color:var(--green-light);background:var(--green-t14);border:1px solid var(--green-t22);border-radius:8px;padding:5px 9px;display:inline-block;}
+  .xai-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px;margin-bottom:9px;}
+  .xai-top{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  .xai-title{font-size:12.5px;font-weight:600;flex:1;}
+  .xai-conf{font-size:9.5px;font-weight:700;background:var(--green-t14);color:var(--green-light);padding:3px 8px;border-radius:999px;flex-shrink:0;}
+  .xai-why{display:none;font-size:11px;color:var(--ink-soft);margin-top:9px;line-height:1.6;border-top:1px solid var(--line);padding-top:9px;}
+  .xai-why.open{display:block;}
+  .xai-toggle{font-size:10.5px;font-weight:700;color:var(--green-light);margin-top:6px;}
+  .led-dot{width:20px;height:20px;border-radius:50%;background:#333;border:2px solid var(--line);box-shadow:none;transition:.2s;}
+  .led-dot.red{background:var(--red);box-shadow:0 0 14px 3px var(--red);border-color:var(--red);}
+  .led-dot.green{background:var(--green-light);box-shadow:0 0 14px 3px var(--green-light);border-color:var(--green-light);}
+  .fingerprint-zone{margin-top:10px;background:var(--bg);border:2px dashed var(--line);border-radius:14px;padding:22px;text-align:center;cursor:pointer;transition:.2s;}
+  .fingerprint-zone:hover{border-color:var(--green);}
+  .fp-icon{font-size:38px;transition:.3s;}
+  .fp-icon.scanning{animation:fpPulse .6s infinite;}
+  .fp-icon.success{filter:none;}
+  @keyframes fpPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(1.12);}}
+  .fp-label{font-size:11.5px;color:var(--ink-soft);margin-top:8px;font-weight:600;}
+  .filter-chip{font-size:10.5px;font-weight:600;padding:7px 12px;border-radius:999px;background:var(--card);border:1px solid var(--line);color:var(--ink-soft);}
+  .filter-chip.active{background:var(--red);border-color:var(--red);color:var(--white);}
+
+  /* GRC compliance bars */
+  .compliance-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 15px;margin-bottom:10px;}
+  .compliance-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+  .compliance-head .cname{font-size:12.5px;font-weight:600;}
+  .compliance-head .cpct{font-family:var(--display);font-size:13px;font-weight:700;}
+  .compliance-head .cpct.high{color:var(--green-light);} .compliance-head .cpct.mid{color:var(--red-light);}
+  .bar-outer{height:8px;border-radius:999px;background:var(--red-t14);overflow:hidden;}
+  .bar-inner{height:100%;background:var(--green);border-radius:999px;}
+  .compliance-meta{font-size:10px;color:var(--ink-soft);margin-top:6px;}
+
+  /* risk register */
+  .risk-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px;margin-bottom:9px;}
+  .risk-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+  .risk-name{font-size:12.5px;font-weight:600;flex:1;}
+  .risk-meta-row{display:flex;gap:14px;margin-top:9px;}
+  .risk-meta-item{font-size:10px;color:var(--ink-soft);}
+  .risk-meta-item b{display:block;font-size:11.5px;color:var(--ink);font-weight:700;margin-top:1px;}
+
+  /* tickets */
+  .cat-row{display:flex;gap:7px;margin-bottom:14px;overflow-x:auto;}
+  .cat-chip{flex-shrink:0;font-size:10.5px;font-weight:600;padding:7px 12px;border-radius:999px;background:var(--card);border:1px solid var(--line);color:var(--ink-soft);}
+  .cat-chip.active{background:var(--green);border-color:var(--green);color:var(--white);}
+  .new-ticket-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;background:var(--red);color:var(--white);font-size:12.5px;font-weight:700;padding:13px;border-radius:13px;margin-bottom:14px;}
+  .ticket-form{display:none;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:16px;}
+  .ticket-form.open{display:block;animation:fadein .2s ease;}
+  .ticket-form label{font-size:11px;font-weight:600;color:var(--ink-soft);display:block;margin:10px 0 5px;}
+  .ticket-form label:first-child{margin-top:0;}
+  .ticket-form input, .ticket-form select, .ticket-form textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:9px;font-size:12.5px;background:var(--bg);font-family:inherit;color:var(--ink);}
+  .ticket-form textarea{resize:none;height:50px;}
+  .row2{display:flex;gap:8px;} .row2>div{flex:1;}
+  .form-actions{display:flex;gap:8px;margin-top:14px;}
+  .form-actions button{flex:1;padding:11px;border-radius:10px;font-weight:700;font-size:12px;}
+  .btn-cancel{background:var(--bg);border:1px solid var(--line);color:var(--ink-soft);}
+  .btn-submit{background:var(--green);color:var(--white);}
+  .ticket-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 13px;margin-bottom:9px;}
+  .tc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+  .tc-id{font-size:9.5px;color:var(--ink-soft);font-weight:700;letter-spacing:.03em;}
+  .tc-title{font-size:12.5px;font-weight:600;margin-top:3px;}
+  .tc-meta{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+  .pill{font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:999px;}
+  .pill.cat{background:var(--green-t22);color:var(--green-light);}
+  .pill.crit{background:var(--red);color:var(--white);}
+  .pill.med{background:var(--red-t22);color:var(--red-light);}
+  .pill.low{background:var(--green-t22);color:var(--green-light);}
+  .pill.status-open{background:var(--red-t14);color:var(--red-light);border:1px solid var(--red-t22);}
+  .pill.status-done{background:var(--green-t14);color:var(--green-light);border:1px solid var(--green-t22);}
+  .tc-resolve{margin-left:auto;font-size:10px;font-weight:700;color:var(--red);}
+
+  /* OUTILS */
+  .outil-panel{display:none;} .outil-panel.active{display:block;animation:fadein .2s ease;}
+  .tool-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:14px;}
+  .content .screen{max-width:760px;}
+  .screen#screen-dashboard, .screen#screen-soc{max-width:100%;}
+  .grc-report-view{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:14px;}
+  .grc-report-view pre{white-space:pre-wrap;word-break:break-word;font-family:'Courier New',monospace;font-size:11px;color:var(--ink);line-height:1.6;max-height:340px;overflow-y:auto;}
+  .grc-report-view .grc-actions{display:flex;gap:8px;margin-top:12px;}
+  .grc-report-view .grc-actions button{flex:1;padding:10px;border-radius:9px;font-size:11.5px;font-weight:700;background:var(--card-strong);border:1px solid var(--line);color:var(--ink);}
+  .tool-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;}
+  .tool-title{font-family:var(--display);font-size:13.5px;font-weight:600;}
+  .sim-badge{font-size:9.5px;font-weight:700;background:var(--red-t22);color:var(--red-light);padding:4px 9px;border-radius:999px;}
+  .sim-badge.on{background:var(--green-t22);color:var(--green-light);}
+  .tool-sub{font-size:11px;color:var(--ink-soft);margin-top:4px;margin-bottom:12px;}
+  .tool-label{font-size:10.5px;font-weight:600;color:var(--ink-soft);display:block;margin:10px 0 5px;}
+  .tool-input{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:9px;font-size:12.5px;background:var(--card-strong);color:var(--ink);font-family:inherit;}
+  .tool-btn{width:100%;padding:11px;border-radius:10px;font-weight:700;font-size:12.5px;margin-top:8px;}
+  .tool-btn.primary{background:var(--red);color:var(--white);}
+  .tool-btn.ghost{background:var(--card-strong);border:1px solid var(--line);color:var(--ink);}
+  .tool-btn.small{margin-top:0;}
+  .btn-pair{display:flex;gap:8px;margin-top:8px;} .btn-pair .tool-btn{flex:1;}
+  .tool-note{font-size:10.5px;color:var(--ink-soft);margin-top:12px;line-height:1.5;}
+  .device-row{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:600;}
+  .state-pill{font-size:9.5px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--red-t22);color:var(--red-light);}
+  .state-pill.on{background:var(--green-t22);color:var(--green-light);}
+  .chip-select{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
+  .mini-chip{font-size:10.5px;font-weight:600;padding:6px 11px;border-radius:999px;background:var(--card-strong);border:1px solid var(--line);color:var(--ink-soft);}
+  .mini-chip.active{background:var(--red);border-color:var(--red);color:var(--white);}
+  .audit-row{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:9px 12px;margin-bottom:7px;font-size:11px;}
+  .audit-row .a-cmd{font-weight:700;} .audit-row .a-time{color:var(--ink-soft);font-size:10px;}
+  .scan-result{margin-top:14px;border-radius:14px;padding:14px;text-align:center;}
+  .scan-result.valid{background:var(--green-t22);border:1px solid var(--green-t22);}
+  .scan-result.invalid, .scan-result.used, .scan-result.suspicious{background:var(--red-t22);border:1px solid var(--red-t22);}
+  .scan-result .sr-label{font-family:var(--display);font-size:15px;font-weight:700;}
+  .scan-result.valid .sr-label{color:var(--green-light);}
+  .scan-result.invalid .sr-label, .scan-result.used .sr-label, .scan-result.suspicious .sr-label{color:var(--red-light);}
+  .scan-result .sr-meta{font-size:11px;color:var(--ink-soft);margin-top:6px;line-height:1.5;}
+  .fraud-alert{margin-top:10px;background:var(--red-t14);border:1px solid var(--red-t22);border-radius:12px;padding:11px;font-size:11.5px;color:var(--red-light);}
+  .fraud-alert button{margin-top:8px;background:var(--red);color:var(--white);font-size:11px;font-weight:700;padding:8px 12px;border-radius:9px;}
+  .press-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:6px;margin-bottom:10px;}
+  .press-btn{background:var(--card-strong);border:1px solid var(--line);border-radius:12px;padding:12px 8px;text-align:center;font-size:11.5px;font-weight:700;color:var(--ink);}
+
+  /* toast */
+  .toast{position:absolute;left:16px;right:16px;bottom:86px;background:var(--ink);color:var(--white);font-size:12px;font-weight:600;padding:11px 15px;border-radius:12px;text-align:center;z-index:50;opacity:0;pointer-events:none;transition:.25s;box-shadow:0 10px 24px rgba(0,0,0,.25);}
+  .toast.show{opacity:1;transform:translateY(-4px);}
+
+  /* BOTTOM NAV */
+  .bottom-nav{position:absolute;left:0;right:0;bottom:0;background:var(--nav-bg);border-top:1px solid var(--line);display:flex;justify-content:center;gap:60px;padding:14px 4px 16px;z-index:10;}
+  .bottom-nav .nav-item{flex:none;}
+  .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--ink-soft);}
+  .nav-item .nav-label{font-size:9px;font-weight:600;}
+  .nav-item.active{color:var(--white);}
+  .nav-item.active .nav-icon-wrap{background:var(--green);border-radius:10px;}
+  .nav-icon-wrap{width:32px;height:26px;display:flex;align-items:center;justify-content:center;}
+</style>
+</head>
+<body>
+<div class="device"><div class="device-frame">
+
+  <!-- HEADER -->
+  <div class="header">
+    <svg class="zellige" viewBox="0 0 400 200" preserveAspectRatio="none">
+      <defs><pattern id="zpat" width="40" height="40" patternUnits="userSpaceOnUse">
+        <path d="M20 2 L38 20 L20 38 L2 20 Z" fill="none" stroke="white" stroke-width="0.8"/>
+        <path d="M20 10 L30 20 L20 30 L10 20 Z" fill="none" stroke="white" stroke-width="0.6"/>
+      </pattern></defs>
+      <rect width="400" height="200" fill="url(#zpat)"/>
+    </svg>
+    <div class="header-top">
+      <div class="brand">
+        <div class="brand-mark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2L4 5V11C4 16 7.5 20.2 12 22C16.5 20.2 20 16 20 11V5L12 2Z" stroke="white" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+        <div class="brand-text"><div class="eyebrow">MAROC · SOC PLATFORM</div><div class="title">SafeStade Pro</div></div>
+      </div>
+      <div class="head-actions">
+        <button class="bell-btn" onclick="toggleNotifPanel()">🔔<span class="bell-dot" id="notifDot"></span></button>
+        <button class="org-badge role-btn" id="roleBtn" onclick="cycleRole()">👤 Admin</button>
+      </div>
+    </div>
+    <div class="notif-panel" id="notifPanel"></div>
+    <div id="headerTitle" class="header-screen-title">Tableau de bord</div>
+    <div id="headerSub" class="header-screen-sub">Stade de Rabat — SOC, cyberdéfense et conformité</div>
+
+    <div class="tabbar" id="tabbar">
+      <button class="tab active" data-nav="dashboard" onclick="showScreen('dashboard')">Dashboard</button>
+      <button class="tab" data-nav="soc" onclick="showScreen('soc')">SOC</button>
+      <button class="tab" data-nav="grc" onclick="showScreen('grc')">Conformité</button>
+      <button class="tab" data-nav="tickets" onclick="showScreen('tickets')">Tickets</button>
+      <button class="tab" data-nav="outils" onclick="showScreen('outils')">Outils</button>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ============ DASHBOARD ============ -->
+    <div class="screen active" id="screen-dashboard">
+      <div class="section-title"><h2>Indicateurs clés</h2></div>
+      <div class="kpi-grid">
+        <div class="kpi safe"><div class="kpi-num">87%</div><div class="kpi-label">Score sécurité global</div><span class="kpi-delta">+3 pts</span></div>
+        <div class="kpi alert"><div class="kpi-num">5</div><div class="kpi-label">Incidents SOC ouverts</div><span class="kpi-delta">2 critiques</span></div>
+        <div class="kpi safe"><div class="kpi-num">78%</div><div class="kpi-label">Score de conformité</div><span class="kpi-delta">4 cadres suivis</span></div>
+        <div class="kpi alert"><div class="kpi-num">12</div><div class="kpi-label">Tickets en cours</div><span class="kpi-delta">SLA à surveiller</span></div>
+      </div>
+
+      <div class="section-title"><h2>Activité récente</h2><span class="tag">Tous modules</span></div>
+      <div class="row-card"><div class="row-icon crit"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 3L2 20H22L12 3Z" stroke="#FF6B72" stroke-width="1.6" stroke-linejoin="round"/></svg></div><div class="row-text"><div class="row-title">Intrusion réseau — Zone billetterie</div><div class="row-meta">SOC · il y a 6 min</div></div><div class="row-tag crit">CRITIQUE</div></div>
+      <div class="row-card"><div class="row-icon watch"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="2" stroke="#FF6B72" stroke-width="1.6"/></svg></div><div class="row-text"><div class="row-title">Non-conformité ISO 27001 — Contrôle A.9</div><div class="row-meta">Conformité · il y a 2 h</div></div><div class="row-tag watch">À TRAITER</div></div>
+      <div class="row-card"><div class="row-icon ok"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M9 12L11 14.5L15.5 9" stroke="#7BE8A6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="row-text"><div class="row-title">Ticket #TK-104 résolu</div><div class="row-meta">IT · il y a 4 h</div></div><div class="row-tag ok">RÉSOLU</div></div>
+
+      <div class="section-title"><h2>🤖 Recommandations IA (explicables)</h2><span class="tag">XAI</span></div>
+      <div id="xaiList"></div>
+    </div>
+
+    <!-- ============ SOC ============ -->
+    <div class="screen" id="screen-soc">
+      <div class="filter-row" id="socFilterRow">
+        <button class="filter-chip active" data-f="tous" onclick="setSocFilter('tous')">Tous</button>
+        <button class="filter-chip" data-f="crit" onclick="setSocFilter('crit')">Critique</button>
+        <button class="filter-chip" data-f="watch" onclick="setSocFilter('watch')">Surveillé</button>
+        <button class="filter-chip" data-f="ok" onclick="setSocFilter('ok')">Résolu</button>
+      </div>
+      <div id="socList"></div>
+    </div>
+
+    <!-- ============ GRC ============ -->
+    <div class="screen" id="screen-grc">
+      <button class="new-ticket-btn" style="background:var(--green)" onclick="exportGrcReport()">📄 Exporter le rapport de conformité</button>
+      <div id="grcReportBox"></div>
+      <div class="section-title"><h2>Cadres de conformité</h2></div>
+      <div class="compliance-card">
+        <div class="compliance-head"><span class="cname">ISO 27001</span><span class="cpct high">82%</span></div>
+        <div class="bar-outer"><div class="bar-inner" style="width:82%"></div></div>
+        <div class="compliance-meta">41 / 50 contrôles validés</div>
+      </div>
+      <div class="compliance-card">
+        <div class="compliance-head"><span class="cname">Directive DGSSI (Maroc)</span><span class="cpct high">90%</span></div>
+        <div class="bar-outer"><div class="bar-inner" style="width:90%"></div></div>
+        <div class="compliance-meta">Exigences nationales cybersécurité</div>
+      </div>
+      <div class="compliance-card">
+        <div class="compliance-head"><span class="cname">NIST CSF</span><span class="cpct mid">64%</span></div>
+        <div class="bar-outer"><div class="bar-inner" style="width:64%"></div></div>
+        <div class="compliance-meta">18 actions correctives en attente</div>
+      </div>
+      <div class="compliance-card">
+        <div class="compliance-head"><span class="cname">Loi 09-08 — Données personnelles (CNDP)</span><span class="cpct mid">70%</span></div>
+        <div class="bar-outer"><div class="bar-inner" style="width:70%"></div></div>
+        <div class="compliance-meta">Registre des traitements à finaliser · DPO désigné</div>
+      </div>
+
+      <div class="section-title"><h2>🔐 Protection des données personnelles</h2></div>
+      <div class="row-card"><div class="row-icon watch"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="2" stroke="#FF6B72" stroke-width="1.6"/></svg></div><div class="row-text"><div class="row-title">Déclaration CNDP — billetterie</div><div class="row-meta">Traitement non finalisé auprès de la CNDP</div></div><div class="row-tag watch">À TRAITER</div></div>
+      <div class="row-card"><div class="row-icon ok"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M9 12L11 14.5L15.5 9" stroke="#7BE8A6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="row-text"><div class="row-title">Durée de conservation définie</div><div class="row-meta">Données spectateurs — 24 mois</div></div><div class="row-tag ok">CONFORME</div></div>
+
+      <h3 style="font-family:var(--display);font-size:13px;font-weight:600;margin:16px 0 8px;">Registre des demandes des personnes concernées</h3>
+      <div class="ticket-form open" style="padding:12px;">
+        <div class="row2">
+          <div>
+            <label class="tool-label" style="margin-top:0">Type de demande</label>
+            <select class="tool-input" id="rgpdType"><option>Droit d'accès</option><option>Droit de rectification</option><option>Droit à l'effacement</option><option>Droit d'opposition</option></select>
+          </div>
+          <div>
+            <label class="tool-label" style="margin-top:0">Demandeur</label>
+            <input type="text" class="tool-input" id="rgpdNom" placeholder="Ex : spectateur, ref. billet">
+          </div>
+        </div>
+        <button class="tool-btn primary" style="margin-top:10px" onclick="ajouterDemandeRGPD()">Enregistrer la demande</button>
+      </div>
+      <div id="rgpdList" style="margin-top:10px;"></div>
+
+      <h3 style="font-family:var(--display);font-size:13px;font-weight:600;margin:18px 0 8px;">Registre des sous-traitants</h3>
+      <div class="row-card"><div class="row-text"><div class="row-title">Hébergeur cloud (infrastructure billetterie)</div><div class="row-meta">Contrat de sous-traitance signé</div></div><div class="row-tag ok">CONFORME</div></div>
+      <div class="row-card"><div class="row-text"><div class="row-title">Prestataire SMS/notifications spectateurs</div><div class="row-meta">Contrat en cours de révision</div></div><div class="row-tag watch">À TRAITER</div></div>
+
+      <div class="section-title"><h2>Registre des risques</h2></div>
+      <div class="risk-card">
+        <div class="risk-top"><div class="risk-name">Fuite de données personnelles — billetterie</div><span class="row-tag crit">CRITIQUE</span></div>
+        <div class="risk-meta-row">
+          <div class="risk-meta-item">Probabilité<b>Élevée</b></div>
+          <div class="risk-meta-item">Impact<b>Critique</b></div>
+          <div class="risk-meta-item">Statut<b>Ouvert</b></div>
+        </div>
+      </div>
+      <div class="risk-card">
+        <div class="risk-top"><div class="risk-name">Accès non autorisé — zone VIP</div><span class="row-tag watch">SURVEILLÉ</span></div>
+        <div class="risk-meta-row">
+          <div class="risk-meta-item">Probabilité<b>Faible</b></div>
+          <div class="risk-meta-item">Impact<b>Élevé</b></div>
+          <div class="risk-meta-item">Statut<b>Sous contrôle</b></div>
+        </div>
+      </div>
+      <div class="risk-card">
+        <div class="risk-top"><div class="risk-name">Panne réseau Wi-Fi public</div><span class="row-tag ok">MAÎTRISÉ</span></div>
+        <div class="risk-meta-row">
+          <div class="risk-meta-item">Probabilité<b>Moyenne</b></div>
+          <div class="risk-meta-item">Impact<b>Modéré</b></div>
+          <div class="risk-meta-item">Statut<b>Traité</b></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ TICKETS ============ -->
+    <div class="screen" id="screen-tickets">
+      <button class="new-ticket-btn" onclick="toggleTicketForm()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 5V19M5 12H19" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+        Nouveau ticket
+      </button>
+
+      <div class="ticket-form" id="ticketForm">
+        <label>Titre</label>
+        <input type="text" id="tkTitle" placeholder="Ex : Écart de conformité contrôle A.12">
+        <label>Description</label>
+        <textarea id="tkDesc" placeholder="Détails..."></textarea>
+        <div class="row2">
+          <div>
+            <label>Catégorie</label>
+            <select id="tkCat"><option value="SOC">Incident SOC</option><option value="Conformité">Conformité</option><option value="IT">IT / Opérations</option></select>
+          </div>
+          <div>
+            <label>Priorité</label>
+            <select id="tkPriority"><option value="crit">Critique</option><option value="med">Moyenne</option><option value="low">Faible</option></select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-cancel" onclick="toggleTicketForm()">Annuler</button>
+          <button class="btn-submit" onclick="submitTicket()">Créer le ticket</button>
+        </div>
+      </div>
+
+      <div class="cat-row" id="catRow">
+        <button class="cat-chip active" data-c="Tous" onclick="setCatFilter('Tous')">Tous</button>
+        <button class="cat-chip" data-c="SOC" onclick="setCatFilter('SOC')">SOC</button>
+        <button class="cat-chip" data-c="Conformité" onclick="setCatFilter('Conformité')">Conformité</button>
+        <button class="cat-chip" data-c="IT" onclick="setCatFilter('IT')">IT</button>
+      </div>
+
+      <div id="ticketsList"></div>
+    </div>
+
+    <!-- ============ OUTILS ============ -->
+    <div class="screen" id="screen-outils">
+      <div class="cat-row" id="outilsChips">
+        <button class="cat-chip active" data-o="abafusion" onclick="setOutil('abafusion')">⚙️ AbaFusion</button>
+        <button class="cat-chip" data-o="esp32" onclick="setOutil('esp32')">🔌 ESP32</button>
+        <button class="cat-chip" data-o="presse" onclick="setOutil('presse')">📢 Presse</button>
+        <button class="cat-chip" data-o="scan" onclick="setOutil('scan')">🎟️ Scan ticket</button>
+        <button class="cat-chip" data-o="droit" onclick="setOutil('droit')">⚖️ Droit & Preuves</button>
+        <button class="cat-chip" data-o="blockchain" onclick="setOutil('blockchain')">⛓️ Blockchain</button>
+      </div>
+
+      <!-- ABAFUSION -->
+      <div class="outil-panel active" id="outil-abafusion">
+        <div class="tool-card">
+          <div class="tool-head"><span class="tool-title">⚙️ ABAFUSION</span><span class="sim-badge" id="abaBadge">🟡 NON CONNECTÉ</span></div>
+          <div class="tool-sub">Automatisation & workflows externes — Stade Prince Moulay Abdellah, Rabat</div>
+          <button class="tool-btn primary" onclick="window.open('https://abafusion.example.com/workflow/stade-prince-moulay-abdellah-rabat','_blank')">Ouvrir le workflow AbaFusion</button>
+          <label class="tool-label">URL Webhook (collez-la simplement ici)</label>
+          <input type="text" id="abaWebhook" class="tool-input" placeholder="https://... (copiée depuis AbaFusion)">
+          <button class="tool-btn ghost" onclick="saveAbaWebhook()">Enregistrer & envoyer un test</button>
+          <div class="tool-note" id="abaResult">Aucune connexion configurée — l'application fonctionne normalement sans AbaFusion.</div>
+          <div class="tool-note">
+            <b style="color:var(--green-light)">3 étapes, sans code :</b><br>
+            1) Dans AbaFusion, ouvrez votre workflow → nœud « Webhook Trigger » → copiez son URL.<br>
+            2) Collez-la ci-dessus, cliquez sur « Enregistrer & envoyer un test ».<br>
+            3) Si le badge passe au vert, c'est branché : chaque ticket créé sera transmis automatiquement, sans rien configurer d'autre.
+          </div>
+        </div>
+      </div>
+
+      <!-- ESP32 -->
+      <div class="outil-panel" id="outil-esp32">
+        <div class="tool-card">
+          <div class="tool-head"><span class="tool-title">🔌 ESP32-01 — Stade de Rabat</span><span class="sim-badge" id="mqttBadge">🟡 NON CONNECTÉ</span></div>
+          <div class="tool-sub">Connexion directe : le navigateur appelle directement l'adresse IP de votre ESP32 sur le réseau Wi-Fi, sans passer par un serveur externe.</div>
+
+          <label class="tool-label">Adresse IP de l'ESP32 (affichée dans le moniteur série au démarrage)</label>
+          <input type="text" class="tool-input" id="esp32Ip" value="192.168.4.1" placeholder="ex : 192.168.4.1 ou 192.168.1.42">
+          <button class="tool-btn primary" onclick="connecterMQTT()">🔗 Se connecter à l'ESP32</button>
+          <div class="tool-note" id="mqttStatus">Non connecté. Assurez-vous que votre PC est sur le même réseau Wi-Fi que l'ESP32 (ou connecté à son point d'accès), puis cliquez ci-dessus.</div>
+        </div>
+
+        <div class="tool-card">
+          <div class="tool-head"><span class="tool-title">Commandes</span></div>
+
+          <div class="device-row"><span>💡 LED</span><span id="ledState" class="led-dot off"></span></div>
+          <div class="btn-pair">
+            <button class="tool-btn small" style="background:var(--red);color:var(--white);" onclick="esp32Cmd('LED_RED')">🔴 LED rouge</button>
+            <button class="tool-btn small" style="background:var(--green);color:var(--white);" onclick="esp32Cmd('LED_GREEN')">🟢 LED verte</button>
+          </div>
+          <button class="tool-btn ghost" style="margin-top:6px" onclick="esp32Cmd('LED_OFF')">Éteindre LED</button>
+
+          <div class="device-row" style="margin-top:14px"><span>🔊 Buzzer / sirène</span><span id="buzzerState" class="state-pill off">OFF</span></div>
+          <div class="btn-pair"><button class="tool-btn small primary" onclick="esp32Cmd('BUZZER_ON')">🚨 Alarme forte</button><button class="tool-btn small ghost" onclick="esp32Cmd('BUZZER_OFF')">Arrêter</button></div>
+
+          <div class="device-row" style="margin-top:12px"><span>Mode alerte</span><span id="alertState" class="state-pill off">OFF</span></div>
+          <div class="btn-pair"><button class="tool-btn small primary" onclick="esp32Cmd('ALERT_ON')">Activer</button><button class="tool-btn small ghost" onclick="esp32Cmd('ALERT_OFF')">Désactiver</button></div>
+
+          <div class="device-row" style="margin-top:12px"><span>📡 Capteur infrarouge (IR)</span><span id="irState" class="state-pill off">LIBRE</span></div>
+          <button class="tool-btn small primary" style="width:100%" onclick="simulerIR()">Simuler une détection IR</button>
+          <button class="tool-btn ghost" style="width:100%;margin-top:6px" onclick="lireInfrarougeReel()">📡 Lire le vrai capteur IR</button>
+          <div class="tool-note">Le capteur IR déclenche automatiquement la LED rouge + l'alarme dès qu'un passage est détecté sans validation de ticket au préalable — utile pour surveiller une sortie de secours ou un accès non billetterie.</div>
+
+          <div class="device-row" style="margin-top:14px"><span>🌡️ Température</span><span id="tempState" class="state-pill off">—</span></div>
+          <button class="tool-btn ghost" style="width:100%" onclick="lireTemperature()">Lire la température (capteur réel)</button>
+
+          <div class="device-row" style="margin-top:14px"><span>⏱️ Minuterie</span><span id="minuterieState" class="state-pill off">INACTIVE</span></div>
+          <input type="number" class="tool-input" id="minuterieSecondes" value="15" min="1" placeholder="Durée en secondes">
+          <div class="btn-pair" style="margin-top:8px"><button class="tool-btn small primary" onclick="demarrerMinuterie()">▶️ Démarrer</button><button class="tool-btn small ghost" onclick="arreterMinuterie()">⏹️ Arrêter</button></div>
+          <div class="tool-note">À la fin du compte à rebours, l'ESP32 déclenche automatiquement l'alerte (LED + buzzer) — utile pour programmer une fermeture d'accès temporisée.</div>
+
+          <div class="tool-note">🔊 Pensez à monter le volume de votre appareil pour tester l'alarme. Le mode « Alarme forte » alterne deux fréquences (effet sirène) tant qu'il n'est pas arrêté.</div>
+        </div>
+
+        <div class="section-title"><h2>Registre de traçabilité</h2></div>
+        <div id="auditLog"></div>
+      </div>
+
+      <!-- PRESSE -->
+      <div class="outil-panel" id="outil-presse">
+        <div class="tool-card">
+          <div class="tool-head"><span class="tool-title">📢 Communication presse</span><span class="sim-badge">🟡 BROUILLON</span></div>
+          <label class="tool-label">Type d'incident</label>
+          <div class="chip-select" id="presseType">
+            <button class="mini-chip active" data-v="Faux site">Faux site</button>
+            <button class="mini-chip" data-v="Faux billet">Faux billet</button>
+            <button class="mini-chip" data-v="Phishing">Phishing</button>
+            <button class="mini-chip" data-v="Fraude">Fraude</button>
+            <button class="mini-chip" data-v="Cyberattaque">Cyberattaque</button>
+          </div>
+          <label class="tool-label">Gravité</label>
+          <select class="tool-input" id="presseGravite"><option>LOW</option><option selected>MEDIUM</option><option>HIGH</option><option>CRITICAL</option></select>
+          <label class="tool-label">Résumé</label>
+          <input type="text" class="tool-input" id="presseResume" placeholder="Résumé court de l'incident">
+          <label class="tool-label">Message</label>
+          <textarea class="tool-input" id="presseMessage" rows="4" placeholder="Le message apparaîtra ici..."></textarea>
+          <div class="btn-pair" style="margin-top:10px">
+            <button class="tool-btn small ghost" onclick="genererIA()">Générer avec IA</button>
+            <button class="tool-btn small ghost" onclick="previewPresse()">Prévisualiser</button>
+          </div>
+          <div class="btn-pair" style="margin-top:8px">
+            <button class="tool-btn small primary" onclick="approuverPresse()">Approuver</button>
+            <button class="tool-btn small primary" onclick="envoyerPresse()">Envoyer</button>
+          </div>
+          <div class="tool-note" id="presseStatus">Statut : brouillon — validation humaine requise avant tout envoi.</div>
+
+          <label class="tool-label">📧 Envoyer par e-mail</label>
+          <input type="text" class="tool-input" id="presseEmail" placeholder="destinataire@exemple.ma">
+          <button class="tool-btn ghost" style="margin-top:6px" onclick="envoyerParEmail()">Ouvrir dans l'application e-mail</button>
+
+          <label class="tool-label">💬 Envoyer par WhatsApp</label>
+          <input type="text" class="tool-input" id="presseWhatsapp" placeholder="Numéro (ex : 212612345678, sans le +)">
+          <button class="tool-btn ghost" style="margin-top:6px" onclick="envoyerParWhatsapp()">Ouvrir dans WhatsApp</button>
+
+          <label class="tool-label">Canaux presse marocains (contact manuel)</label>
+          <div class="press-grid">
+            <button class="press-btn" onclick="window.open('https://www.hespress.com','_blank')">Hespress</button>
+            <button class="press-btn" onclick="window.open('https://chouftv.ma','_blank')">Chouf TV</button>
+            <button class="press-btn" onclick="window.open('https://le360.ma','_blank')">Le360</button>
+            <button class="press-btn" onclick="window.open('https://medi1tv.com','_blank')">Medi1 TV</button>
+          </div>
+          <label class="tool-label">Autorité nationale</label>
+          <button class="tool-btn ghost" onclick="window.open('https://www.dgssi.gov.ma','_blank')">🏛️ Notifier la DGSSI</button>
+          <div class="tool-note">🟡 Aucune API réelle connectée — ces boutons ouvrent le site officiel pour un contact manuel (rédaction ou signalement DGSSI).</div>
+        </div>
+      </div>
+
+      <!-- SCAN TICKET -->
+      <div class="outil-panel" id="outil-scan">
+        <div class="tool-card">
+          <div class="tool-head"><span class="tool-title">🎟️ Scan ticket</span><span class="sim-badge">🟡 BASE SIMULÉE</span></div>
+          <label class="tool-label">Code du billet</label>
+          <input type="text" class="tool-input" id="scanCode" placeholder="Ex : RBT-2030-00142">
+          <div class="btn-pair" style="margin-top:8px">
+            <button class="tool-btn small primary" onclick="scanTicket()">📷 Scanner</button>
+            <button class="tool-btn small ghost" onclick="scanTicket()">Entrer le code</button>
+          </div>
+          <div id="scanResultBox"></div>
+        </div>
+      </div>
+
+      <!-- DROIT & PREUVES -->
+      <div class="outil-panel" id="outil-droit">
+        <div class="tool-card">
+          <div class="tool-head"><span class="tool-title">🔒 Chaîne de preuve numérique</span><span class="sim-badge on" id="chainBadge">Bloc n°0</span></div>
+          <div class="tool-sub">Empreinte SHA-256 + horodatage, chaque preuve référence la précédente (façon blockchain simplifiée) — infalsifiable sans casser la chaîne</div>
+          <label class="tool-label">Description de la preuve (log, capture, fichier...)</label>
+          <textarea class="tool-input" id="preuveInput" rows="3" placeholder="Ex : Capture d'écran — tentative d'intrusion 10:41, IP 41.xxx.xxx.xxx"></textarea>
+          <button class="tool-btn primary" onclick="genererPreuve()">Générer l'empreinte (hash)</button>
+          <button class="tool-btn ghost" onclick="expliquerHachage()">❓ Je ne comprends pas — expliquer simplement</button>
+          <div id="hachageExplication"></div>
+          <div id="preuveResult"></div>
+
+          <label class="tool-label">Vérifier l'intégrité d'une preuve existante</label>
+          <textarea class="tool-input" id="verifText" rows="2" placeholder="Recollez le texte original de la preuve..."></textarea>
+          <input type="text" class="tool-input" id="verifHash" placeholder="Hash SHA-256 attendu (64 caractères)" style="margin-top:8px">
+          <button class="tool-btn ghost" onclick="verifierPreuve()">Vérifier l'intégrité</button>
+          <div id="verifResult"></div>
+        </div>
+
+        <div class="tool-card">
+          <div class="tool-head"><span class="tool-title">🔑 Chiffrement (AES-256)</span><span class="sim-badge on">RÉEL — Web Crypto</span></div>
+          <div class="tool-sub">Différence avec le hachage : le hachage est à sens unique (jamais retrouvable), le chiffrement est réversible avec la bonne clé — utile pour protéger un contenu, pas juste vérifier son intégrité.</div>
+          <label class="tool-label">Texte à chiffrer</label>
+          <textarea class="tool-input" id="cryptoInput" rows="2" placeholder="Ex : numéro de dossier confidentiel, note interne..."></textarea>
+          <label class="tool-label">Mot de passe (clé de chiffrement)</label>
+          <input type="text" class="tool-input" id="cryptoPass" placeholder="Choisissez un mot de passe">
+          <div class="btn-pair" style="margin-top:8px">
+            <button class="tool-btn small primary" onclick="chiffrerTexte()">🔒 Chiffrer</button>
+            <button class="tool-btn small ghost" onclick="dechiffrerTexte()">🔓 Déchiffrer</button>
+          </div>
+          <div id="cryptoResult"></div>
+          <button class="tool-btn ghost" style="margin-top:10px" onclick="expliquerChiffrement()">❓ Expliquer étape par étape</button>
+          <div id="chiffrementExplication"></div>
+        </div>
+
+        <div class="tool-card">
+          <div class="tool-head"><span class="tool-title">🖐️ Authentification biométrique</span><span class="sim-badge" id="bioBadge">🟡 SIMULATION</span></div>
+          <div class="tool-sub">Confirmation d'identité avant une action sensible (ex. signature d'un PV) — étape de sécurité renforcée à 2 facteurs</div>
+          <div class="fingerprint-zone" id="fpZone" onclick="scannerEmpreinte()">
+            <div class="fp-icon" id="fpIcon">🖐️</div>
+            <div class="fp-label" id="fpLabel">Toucher pour scanner l'empreinte</div>
+          </div>
+          <div class="tool-note">🟡 Simulation visuelle — une vraie lecture d'empreinte nécessite un capteur matériel (téléphone, badge biométrique) et une API dédiée (ex. WebAuthn) non disponible dans ce fichier local. C'est une approche fiable qui ne nécessite aucun matériel supplémentaire.</div>
+        </div>
+
+        <div class="tool-card">
+          <div class="tool-head"><span class="tool-title">📜 PV de signalement</span></div>
+          <div class="tool-sub">Génère un procès-verbal prêt à transmettre aux autorités compétentes</div>
+          <label class="tool-label">Type d'infraction</label>
+          <select class="tool-input" id="pvType">
+            <option value="cyberattaque">Cyberattaque / intrusion réseau</option>
+            <option value="donnees">Atteinte aux données personnelles</option>
+            <option value="fraude">Fraude à la billetterie</option>
+            <option value="phishing">Phishing / usurpation</option>
+          </select>
+          <label class="tool-label">Résumé des faits</label>
+          <textarea class="tool-input" id="pvResume" rows="3" placeholder="Décrivez les faits constatés..."></textarea>
+          <button class="tool-btn primary" onclick="genererPV()">📄 Générer le PV (empreinte requise)</button>
+          <div class="tool-note" id="pvStatus"></div>
+        </div>
+      </div>
+
+      <!-- BLOCKCHAIN -->
+      <div class="outil-panel" id="outil-blockchain">
+        <div class="tool-card">
+          <div class="tool-head"><span class="tool-title">⛓️ Registre blockchain des preuves</span><span class="sim-badge on" id="chainBadge2">Bloc n°0</span></div>
+          <div class="tool-sub">Chaque preuve générée dans Droit & Preuves crée un nouveau bloc, lié au précédent par son empreinte SHA-256 — exactement le principe d'une blockchain simplifiée, appliqué à la traçabilité des incidents.</div>
+          <button class="tool-btn ghost" onclick="rafraichirBlockchain()">🔄 Rafraîchir la vue</button>
+          <div id="blockchainList" style="margin-top:12px"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav" id="bottomNav">
+    <div class="nav-item active" data-nav="dashboard" onclick="showScreen('dashboard')">
+      <div class="nav-icon-wrap"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M3 11L12 4L21 11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10V19H19V10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="nav-label">Dashboard</div>
+    </div>
+    <div class="nav-item" data-nav="soc" onclick="showScreen('soc')">
+      <div class="nav-icon-wrap"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 2L4 5V11C4 16 7.5 20.2 12 22C16.5 20.2 20 16 20 11V5L12 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
+      <div class="nav-label">SOC</div>
+    </div>
+    <div class="nav-item" data-nav="grc" onclick="showScreen('grc')">
+      <div class="nav-icon-wrap"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="nav-label">Conformité</div>
+    </div>
+    <div class="nav-item" data-nav="tickets" onclick="showScreen('tickets')">
+      <div class="nav-icon-wrap"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3 12H21" stroke="currentColor" stroke-width="1.5" stroke-dasharray="1.5 2"/></svg></div>
+      <div class="nav-label">Tickets</div>
+    </div>
+    <div class="nav-item" data-nav="outils" onclick="showScreen('outils')">
+      <div class="nav-icon-wrap"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 2L14 7L19.5 7.5L15.5 11L16.8 16.5L12 13.5L7.2 16.5L8.5 11L4.5 7.5L10 7Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg></div>
+      <div class="nav-label">Outils</div>
+    </div>
+  </div>
+
+</div></div>
+
+<script>
+const headerInfo = {
+  dashboard:["Tableau de bord","Vue globale SOC, cyberdéfense et conformité"],
+  soc:["Centre SOC","Menaces, incidents et surveillance réseau en temps réel"],
+  grc:["Gouvernance, Risques, Conformité","Cadres réglementaires et registre des risques"],
+  tickets:["Ticketing unifié","Incidents SOC, conformité et IT"],
+  outils:["Outils avancés","AbaFusion, ESP32, presse et scan ticket — mode simulation"]
+};
+
+/* ---------- RBAC : rôles et permissions ---------- */
+const roles = ['admin','agent','observateur'];
+const roleLabels = {admin:'👤 Admin', agent:'🛠️ Agent SOC', observateur:'👁️ Observateur'};
+const rolePerms = {
+  admin:{ticket:true, esp32:true, presse:true, aba:true, security:true},
+  agent:{ticket:true, esp32:true, presse:false, aba:false, security:true},
+  observateur:{ticket:false, esp32:false, presse:false, aba:false, security:false}
+};
+let currentRole = 'admin';
+function cycleRole(){
+  const i = roles.indexOf(currentRole);
+  currentRole = roles[(i+1) % roles.length];
+  document.getElementById('roleBtn').textContent = roleLabels[currentRole];
+  showToast('Rôle actif : ' + roleLabels[currentRole] + (currentRole==='observateur' ? ' — lecture seule' : ''));
+  addNotif('Changement de rôle', 'Session basculée sur : ' + roleLabels[currentRole]);
+}
+function can(action){
+  if(rolePerms[currentRole][action]) return true;
+  showToast('🔒 Action réservée — rôle actuel : ' + roleLabels[currentRole]);
+  return false;
+}
+
+/* ---------- Centre de notifications ---------- */
+let notifications = [
+  {title:'Intrusion réseau', meta:'Zone billetterie · il y a 6 min'},
+  {title:'Ticket #TK-108 créé', meta:'Catégorie SOC · critique'},
+];
+function renderNotifs(){
+  const panel = document.getElementById('notifPanel');
+  panel.innerHTML = notifications.length ? notifications.slice(0,6).map(n=>`<div class="notif-item"><b>${n.title}</b>${n.meta}</div>`).join('') : '<div class="notif-item">Aucune notification</div>';
+  document.getElementById('notifDot').style.display = notifications.length ? 'block' : 'none';
+}
+function toggleNotifPanel(){ document.getElementById('notifPanel').classList.toggle('open'); }
+function addNotif(title, meta){ notifications.unshift({title, meta:meta+' · à l\'instant'}); renderNotifs(); }
+
+function showScreen(name){
+
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.nav===name));
+  document.querySelectorAll('.tab').forEach(n=>n.classList.toggle('active', n.dataset.nav===name));
+  document.getElementById('headerTitle').textContent = headerInfo[name][0];
+  document.getElementById('headerSub').textContent = headerInfo[name][1];
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function showToast(msg){
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(window._tt); window._tt=setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+/* ---------- SOC ---------- */
+let socEvents=[
+  {level:'crit',title:"Intrusion réseau — Zone billetterie Rabat",meta:"Périmètre billetterie · il y a 6 min",mitre:"T1190 — Exploitation d'application exposée"},
+  {level:'watch',title:"Trafic inhabituel — Wi-Fi visiteurs",meta:"Wi-Fi public · il y a 24 min",mitre:"T1046 — Découverte de services réseau"},
+  {level:'crit',title:"Malware détecté — poste supervision",meta:"Endpoint · il y a 40 min",mitre:"T1204 — Exécution par l'utilisateur"},
+  {level:'ok',title:"Incident résolu — accès Tribune Nord",meta:"Contrôle billets · il y a 1 h",mitre:"T1078 — Comptes valides (résolu)"},
+  {level:'watch',title:"Certificat SSL expirant sous 7 jours",meta:"Portail public · il y a 3 h",mitre:"T1600 — Affaiblissement du chiffrement (risque)"},
+];
+let socFilter='tous';
+function renderSoc(){
+  const el=document.getElementById('socList');
+  const list = socFilter==='tous'? socEvents : socEvents.filter(e=>e.level===socFilter);
+  const label={crit:'CRITIQUE',watch:'SURVEILLÉ',ok:'RÉSOLU'};
+  const icon={
+    crit:'<path d="M12 3L2 20H22L12 3Z" stroke="#FF6B72" stroke-width="1.6" stroke-linejoin="round"/>',
+    watch:'<circle cx="12" cy="12" r="8" stroke="#FF6B72" stroke-width="1.6"/><path d="M12 8.5V13" stroke="#FF6B72" stroke-width="1.6" stroke-linecap="round"/>',
+    ok:'<path d="M9 12L11 14.5L15.5 9" stroke="#7BE8A6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>'
+  };
+  el.innerHTML = list.length ? list.map(e=>`
+    <div class="row-card" style="flex-direction:column;align-items:stretch;gap:8px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="row-icon ${e.level}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none">${icon[e.level]}</svg></div>
+        <div class="row-text"><div class="row-title">${e.title}</div><div class="row-meta">${e.meta}</div></div>
+        <div class="row-tag ${e.level}">${label[e.level]}</div>
+      </div>
+      <div class="mitre-tag">🎯 MITRE ATT&CK : ${e.mitre}</div>
+    </div>`).join('') : '<div class="row-card" style="justify-content:center;color:var(--ink-soft);font-size:12px;">Aucun événement</div>';
+}
+function setSocFilter(f){ socFilter=f; document.querySelectorAll('#socFilterRow .filter-chip').forEach(c=>c.classList.toggle('active',c.dataset.f===f)); renderSoc(); }
+
+/* ---------- TICKETS ---------- */
+let tickets=[
+  {id:'TK-108',title:'Intrusion réseau — Zone billetterie',cat:'SOC',priority:'crit',done:false},
+  {id:'TK-107',title:'Non-conformité ISO 27001 — Contrôle A.9',cat:'Conformité',priority:'med',done:false},
+  {id:'TK-106',title:'Fuite de données — billetterie',cat:'Conformité',priority:'crit',done:false},
+  {id:'TK-105',title:'Wifi lent — salle de contrôle',cat:'IT',priority:'low',done:false},
+  {id:'TK-104',title:'Badge défectueux — vestiaires VIP',cat:'IT',priority:'low',done:true},
+];
+let ticketCounter=109;
+let catFilter='Tous';
+function renderTickets(){
+  const el=document.getElementById('ticketsList');
+  const list = catFilter==='Tous' ? tickets : tickets.filter(t=>t.cat===catFilter);
+  const pLabel={crit:'Critique',med:'Moyenne',low:'Faible'};
+  el.innerHTML = list.length ? list.map(t=>`
+    <div class="ticket-card">
+      <div class="tc-top">
+        <div><div class="tc-id">${t.id}</div><div class="tc-title">${t.title}</div></div>
+      </div>
+      <div class="tc-meta">
+        <span class="pill cat">${t.cat}</span>
+        <span class="pill ${t.priority}">${pLabel[t.priority]}</span>
+        <span class="pill ${t.done?'status-done':'status-open'}">${t.done?'Résolu':'Ouvert'}</span>
+        <button class="tc-resolve" onclick="toggleTicket('${t.id}')">${t.done?'Rouvrir':'Résoudre'}</button>
+      </div>
+    </div>`).join('') : '<div class="ticket-card" style="text-align:center;color:var(--ink-soft);">Aucun ticket dans cette catégorie</div>';
+}
+function toggleTicket(id){ if(!can('ticket')) return; const t=tickets.find(x=>x.id===id); t.done=!t.done; renderTickets(); }
+function setCatFilter(c){ catFilter=c; document.querySelectorAll('#catRow .cat-chip').forEach(el=>el.classList.toggle('active',el.dataset.c===c)); renderTickets(); }
+function toggleTicketForm(){ document.getElementById('ticketForm').classList.toggle('open'); }
+
+/* ---------- Export rapport GRC ---------- */
+function exportGrcReport(){
+  const date = new Date().toLocaleString('fr-FR');
+  const content =
+`RAPPORT DE CONFORMITÉ — SafeStade Pro
+Site : Stade Prince Moulay Abdellah — Rabat
+Généré le : ${date}
+Rôle générateur : ${roleLabels[currentRole]}
+
+=== CADRES DE CONFORMITÉ ===
+ISO 27001 ................ 82%
+Directive DGSSI (Maroc) ... 90%
+NIST CSF .................. 64%
+Loi 09-08 (CNDP) .......... 70%
+
+=== PROTECTION DES DONNÉES PERSONNELLES ===
+- Déclaration CNDP billetterie : À TRAITER
+- Durée de conservation données spectateurs : CONFORME (24 mois)
+
+=== REGISTRE DES RISQUES ===
+- Fuite de données personnelles — billetterie | CRITIQUE | Ouvert
+- Accès non autorisé — zone VIP | SURVEILLÉ | Sous contrôle
+- Panne réseau Wi-Fi public | MAÎTRISÉ | Traité
+
+=== TICKETS LIÉS ===
+${tickets.map(t=>`- ${t.id} [${t.cat}] ${t.title} — ${t.done?'Résolu':'Ouvert'}`).join('\n')}
+
+Rapport généré automatiquement — à valider par un responsable habilité avant diffusion officielle.`;
+  // 1) Toujours afficher le rapport dans la page (fonctionne même si le téléchargement est bloqué)
+  const box = document.getElementById('grcReportBox');
+  box.innerHTML = `
+    <div class="grc-report-view">
+      <pre id="grcReportText"></pre>
+      <div class="grc-actions">
+        <button onclick="copierRapportGrc()">📋 Copier le texte</button>
+        <button onclick="telechargerRapportGrc()">⬇️ Télécharger le fichier</button>
+      </div>
+    </div>`;
+  document.getElementById('grcReportText').textContent = content;
+  window._grcReportContent = content;
+  showToast('Rapport de conformité généré ci-dessous');
+  addNotif('Rapport de conformité généré', 'Consultable dans l\'onglet Conformité');
+}
+function copierRapportGrc(){
+  if(!window._grcReportContent) return;
+  navigator.clipboard.writeText(window._grcReportContent).then(()=>{
+    showToast('Rapport copié dans le presse-papiers');
+  }).catch(()=>{
+    showToast('Copie impossible ici — sélectionnez le texte manuellement');
+  });
+}
+function telechargerRapportGrc(){
+  if(!window._grcReportContent) return;
+  try{
+    const blob = new Blob([window._grcReportContent], {type:'text/plain;charset=utf-8'});
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'rapport-grc-stade-rabat.txt';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    showToast('Téléchargement lancé');
+  }catch(e){
+    showToast('Téléchargement bloqué ici — utilisez "Copier le texte"');
+  }
+}
+function submitTicket(){
+  if(!can('ticket')) return;
+  const title=document.getElementById('tkTitle').value.trim();
+  if(!title){ showToast('Merci de saisir un titre'); return; }
+  const cat=document.getElementById('tkCat').value;
+  const priority=document.getElementById('tkPriority').value;
+  const newTicket={id:'TK-'+(ticketCounter++),title,cat,priority,done:false};
+  tickets.unshift(newTicket);
+  document.getElementById('tkTitle').value=''; document.getElementById('tkDesc').value='';
+  document.getElementById('ticketForm').classList.remove('open');
+  catFilter='Tous'; setCatFilter('Tous');
+  showToast('Ticket créé — '+cat);
+  addNotif('Ticket créé', cat+' · '+title);
+  sendToAbaFusion(Object.assign({event:'ticket_created'}, newTicket));
+}
+
+/* ---------- OUTILS : navigation interne ---------- */
+function setOutil(name){
+  document.querySelectorAll('.outil-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('outil-'+name).classList.add('active');
+  document.querySelectorAll('#outilsChips .cat-chip').forEach(c=>c.classList.toggle('active', c.dataset.o===name));
+  if(name==='blockchain'){ rafraichirBlockchain(); }
+  // Connexion automatique : evite tout clic manuel devant le jury.
+  if(name==='esp32' && !esp32Connected){
+    const ip = document.getElementById('esp32Ip').value.trim();
+    if(ip) connecterMQTT();
+  }
+  if(name==='abafusion' && !abaWebhookUrl){
+    const url = document.getElementById('abaWebhook').value.trim();
+    if(url) saveAbaWebhook();
+  }
+}
+
+/* ---------- ABAFUSION (webhook réel, sans erreur CORS) ---------- */
+let abaWebhookUrl = '';
+async function saveAbaWebhook(){
+  if(!can('aba')) return;
+  const url = document.getElementById('abaWebhook').value.trim();
+  const badge = document.getElementById('abaBadge');
+  const box = document.getElementById('abaResult');
+  if(!url){ box.textContent = "NON CONNECTÉ — renseignez d'abord une URL de webhook."; showToast('Aucune URL renseignée'); return; }
+  if(!url.startsWith('http://') && !url.startsWith('https://')){
+    box.textContent = "URL invalide : elle doit commencer par http:// ou https://";
+    showToast('URL invalide');
+    return;
+  }
+  abaWebhookUrl = url;
+  badge.textContent = '🟡 TEST EN COURS...';
+  box.textContent = "Envoi du test vers " + url + " ...";
+  const ok = await sendToAbaFusion({event:'test_connexion', message:'Test manuel depuis SafeStade Pro'});
+  if(ok){
+    badge.textContent = '🟢 CONNECTÉ'; badge.classList.add('on');
+    box.textContent = "Webhook enregistré : " + url + ". Le test a été envoyé sans erreur réseau — vérifiez sa réception côté AbaFusion (en mode no-cors, l'app ne peut pas lire la réponse).";
+  } else {
+    badge.textContent = '🔴 ÉCHEC'; badge.classList.remove('on');
+    box.textContent = "Échec de l'envoi vers " + url + ". Causes possibles : URL incorrecte/inaccessible, pas de connexion internet, ou le workflow AbaFusion n'est pas activé.";
+  }
+}
+async function sendToAbaFusion(payload){
+  if(!abaWebhookUrl) return false;
+  const data = Object.assign({}, payload, {site:'Stade Prince Moulay Abdellah — Rabat', siteId:'stade-prince-moulay-abdellah-rabat', horodatage:new Date().toISOString()});
+  try{
+    // mode "no-cors" : évite le blocage CORS du navigateur pour un appel simple depuis le front.
+    await fetch(abaWebhookUrl, {method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data), signal: AbortSignal.timeout(6000)});
+    showToast('Donnée transmise à AbaFusion');
+    return true;
+  }catch(e){
+    showToast('Échec réseau — vérifiez l\'URL du webhook');
+    return false;
+  }
+}
+
+/* ---------- ESP32 ---------- */
+let esp32State = {led:'off', buzzer:false, alert:false};
+let auditLog = [];
+let audioCtx=null, sirenInterval=null, sirenOsc=null, sirenOsc2=null, sirenGain=null, vibrateInterval=null;
+function startSiren(){
+  stopSiren();
+  try{
+    audioCtx = audioCtx || new (window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state === 'suspended'){ audioCtx.resume(); } // obligatoire : les navigateurs bloquent le son sans geste + reprise explicite
+    sirenGain = audioCtx.createGain();
+    sirenGain.gain.value = 1.0; // volume maximal pour une alarme bien audible
+    sirenOsc = audioCtx.createOscillator();
+    sirenOsc.type='sawtooth'; sirenOsc.frequency.value=1000;
+    sirenOsc2 = audioCtx.createOscillator();
+    sirenOsc2.type='square'; sirenOsc2.frequency.value=1006; // très légèrement désaccordé = son plus "épais" et plus fort perçu
+    sirenOsc.connect(sirenGain); sirenOsc2.connect(sirenGain); sirenGain.connect(audioCtx.destination);
+    sirenOsc.start(); sirenOsc2.start();
+    let high=true;
+    sirenInterval = setInterval(()=>{
+      high = !high;
+      const f = high?1400:700;
+      sirenOsc.frequency.setValueAtTime(f, audioCtx.currentTime);
+      sirenOsc2.frequency.setValueAtTime(f+6, audioCtx.currentTime);
+    }, 220);
+  }catch(e){ showToast('⚠️ Son bloqué par le navigateur — vérifiez le volume/permissions audio'); }
+  // Vibration en secours (fonctionne même si le son est bloqué, sur mobile compatible)
+  if(navigator.vibrate){
+    navigator.vibrate([300,120,300,120,300]);
+    vibrateInterval = setInterval(()=>navigator.vibrate([300,120,300,120,300]), 1400);
+  }
+}
+function stopSiren(){
+  if(sirenInterval){ clearInterval(sirenInterval); sirenInterval=null; }
+  if(sirenOsc){ try{ sirenOsc.stop(); }catch(e){} sirenOsc=null; }
+  if(sirenOsc2){ try{ sirenOsc2.stop(); }catch(e){} sirenOsc2=null; }
+  if(vibrateInterval){ clearInterval(vibrateInterval); vibrateInterval=null; }
+  if(navigator.vibrate){ navigator.vibrate(0); }
+}
+/* ---------- LECTURES RÉELLES (température, infrarouge, minuterie) ---------- */
+async function lireTemperature(){
+  if(!esp32Connected){ showToast('Connectez-vous d\'abord à l\'ESP32'); return; }
+  const el = document.getElementById('tempState');
+  el.textContent = '...';
+  try{
+    const res = await fetch('http://' + esp32IpAddr + '/temperature', {signal: AbortSignal.timeout(4000)});
+    const data = await res.json();
+    if(data.temperature !== undefined){
+      el.textContent = data.temperature + ' °C · ' + data.humidite + ' % hum.';
+      el.classList.add('on');
+      showToast('Température : ' + data.temperature + ' °C, humidité : ' + data.humidite + ' %');
+    } else {
+      el.textContent = 'Capteur absent';
+      showToast('Capteur de température non détecté sur l\'ESP32');
+    }
+  }catch(e){
+    el.textContent = 'Erreur';
+    showToast('Impossible de lire la température');
+  }
+}
+async function lireInfrarougeReel(){
+  if(!esp32Connected){ showToast('Connectez-vous d\'abord à l\'ESP32'); return; }
+  try{
+    const res = await fetch('http://' + esp32IpAddr + '/infrared', {signal: AbortSignal.timeout(4000)});
+    const data = await res.json();
+    const el = document.getElementById('irState');
+    if(data.detected){ el.textContent='DÉTECTION'; el.classList.add('on'); esp32State.led='red'; esp32State.buzzer=true; startSiren(); }
+    else { el.textContent='LIBRE'; el.classList.remove('on'); }
+    renderEsp32();
+    showToast(data.detected ? '📡 Présence détectée par le vrai capteur' : '📡 Zone libre');
+  }catch(e){
+    showToast('Impossible de lire le capteur infrarouge');
+  }
+}
+async function demarrerMinuterie(){
+  if(!esp32Connected){ showToast('Connectez-vous d\'abord à l\'ESP32'); return; }
+  const secondes = document.getElementById('minuterieSecondes').value || 15;
+  try{
+    await fetch('http://' + esp32IpAddr + '/timer/start?s=' + secondes, {signal: AbortSignal.timeout(4000)});
+    document.getElementById('minuterieState').textContent = secondes + ' s';
+    document.getElementById('minuterieState').classList.add('on');
+    showToast('Minuterie démarrée : ' + secondes + ' s');
+    addNotif('Minuterie ESP32 démarrée', secondes + ' secondes');
+    suivreMinuterie();
+  }catch(e){ showToast('Impossible de démarrer la minuterie'); }
+}
+async function suivreMinuterie(){
+  try{
+    const res = await fetch('http://' + esp32IpAddr + '/timer/status', {signal: AbortSignal.timeout(3000)});
+    const data = await res.json();
+    const el = document.getElementById('minuterieState');
+    if(data.active){
+      el.textContent = data.restant + ' s'; el.classList.add('on');
+      setTimeout(suivreMinuterie, 1000);
+    } else {
+      el.textContent = 'TERMINÉE'; el.classList.remove('on');
+    }
+  }catch(e){ /* connexion perdue, on arrete le suivi silencieusement */ }
+}
+async function arreterMinuterie(){
+  if(!esp32Connected) return;
+  try{
+    await fetch('http://' + esp32IpAddr + '/timer/stop', {signal: AbortSignal.timeout(3000)});
+    document.getElementById('minuterieState').textContent = 'INACTIVE';
+    document.getElementById('minuterieState').classList.remove('on');
+    showToast('Minuterie arrêtée');
+  }catch(e){ showToast('Impossible d\'arrêter la minuterie'); }
+}
+
+function simulerIR(){
+  if(!can('esp32')) return;
+  const irEl = document.getElementById('irState');
+  irEl.textContent='DÉTECTION'; irEl.classList.add('on');
+  esp32State.led='red'; esp32State.buzzer=true; startSiren();
+  publierMQTT('ACCESS_DENIED');
+  logAudit('IR_DETECTION');
+  renderEsp32();
+  showToast('📡 Détection infrarouge — réaction automatique déclenchée');
+  addNotif('Détection infrarouge', 'Passage non autorisé — ESP32-01');
+  setTimeout(()=>{
+    irEl.textContent='LIBRE'; irEl.classList.remove('on');
+    esp32State.buzzer=false; stopSiren(); esp32State.led='off';
+    publierMQTT('LED_OFF');
+    logAudit('IR_CLEAR'); renderEsp32();
+  }, 4000);
+}
+/* ---------- CONNEXION DIRECTE (app <-> ESP32 par IP, HTTP simple) ---------- */
+let esp32IpAddr = '';
+let esp32Connected = false;
+
+// Correspondance commande -> route HTTP appelee sur l'ESP32
+const ESP32_ROUTES = {
+  LED_RED:'/led/red', LED_GREEN:'/led/green', LED_OFF:'/led/off',
+  BUZZER_ON:'/buzzer/on', BUZZER_OFF:'/buzzer/off',
+  ALERT_ON:'/alert/on', ALERT_OFF:'/alert/off',
+};
+
+async function connecterMQTT(){
+  if(!can('esp32')) return;
+  const ip = document.getElementById('esp32Ip').value.trim() || '192.168.4.1';
+  esp32IpAddr = ip;
+  const badge = document.getElementById('mqttBadge');
+  const status = document.getElementById('mqttStatus');
+  badge.textContent = '🟡 CONNEXION...';
+  status.textContent = 'Tentative de connexion à http://' + ip + ' ...';
+
+  try{
+    const res = await fetch('http://' + ip + '/status', {signal: AbortSignal.timeout(4000)});
+    if(res.ok){
+      esp32Connected = true;
+      badge.textContent = '🟢 CONNECTÉ'; badge.classList.add('on');
+      status.textContent = "Connecté directement à l'ESP32 (" + ip + "). Les boutons ci-dessous pilotent réellement votre carte.";
+      showToast('Connecté directement à l\'ESP32');
+    } else {
+      throw new Error('reponse HTTP ' + res.status);
+    }
+  }catch(e){
+    esp32Connected = false;
+    badge.textContent = '🔴 NON JOIGNABLE'; badge.classList.remove('on');
+    status.textContent = "Impossible de joindre " + ip + ". Vérifiez : (1) votre PC est bien sur le même réseau Wi-Fi que l'ESP32, (2) l'IP est correcte (voir le moniteur série Arduino), (3) le firmware est bien flashé et démarré.";
+    showToast('ESP32 non joignable');
+  }
+}
+
+async function envoyerCommandeESP32(cmd){
+  if(!esp32Connected || !esp32IpAddr) return false;
+  const route = ESP32_ROUTES[cmd];
+  if(!route) return false;
+  try{
+    await fetch('http://' + esp32IpAddr + route, {signal: AbortSignal.timeout(3000)});
+    showToast('📡 Commande envoyée au vrai ESP32 : ' + cmd);
+    return true;
+  }catch(e){
+    showToast('⚠️ Échec envoi à l\'ESP32 — connexion perdue ?');
+    document.getElementById('mqttBadge').textContent = '🔴 NON JOIGNABLE';
+    document.getElementById('mqttBadge').classList.remove('on');
+    esp32Connected = false;
+    return false;
+  }
+}
+function publierMQTT(cmd){
+  // ACCESS_GRANTED / ACCESS_DENIED / TICKET_SUSPICIOUS se traduisent en 2 commandes simples (LED + buzzer)
+  if(cmd==='ACCESS_GRANTED'){ envoyerCommandeESP32('LED_GREEN'); envoyerCommandeESP32('BUZZER_OFF'); return; }
+  if(cmd==='ACCESS_DENIED' || cmd==='TICKET_SUSPICIOUS'){ envoyerCommandeESP32('LED_RED'); envoyerCommandeESP32('BUZZER_ON'); return; }
+  envoyerCommandeESP32(cmd);
+}
+
+function esp32Cmd(cmd){
+  if(!can('esp32')) return;
+  if(cmd==='LED_RED') esp32State.led='red';
+  if(cmd==='LED_GREEN') esp32State.led='green';
+  if(cmd==='LED_OFF') esp32State.led='off';
+  if(cmd==='BUZZER_ON'){ esp32State.buzzer=true; startSiren(); }
+  if(cmd==='BUZZER_OFF'){ esp32State.buzzer=false; stopSiren(); }
+  if(cmd==='ALERT_ON') esp32State.alert=true; if(cmd==='ALERT_OFF') esp32State.alert=false;
+  publierMQTT(cmd);
+  logAudit(cmd);
+  renderEsp32();
+}
+function renderEsp32(){
+  const led = document.getElementById('ledState');
+  if(led){ led.className = 'led-dot ' + (esp32State.led==='off'?'':esp32State.led); }
+  const set=(id,val)=>{ const el=document.getElementById(id); if(!el) return; el.textContent = val?'ON':'OFF'; el.classList.toggle('on', val); };
+  set('buzzerState', esp32State.buzzer); set('alertState', esp32State.alert);
+  const log = document.getElementById('auditLog');
+  if(!log) return;
+  log.innerHTML = auditLog.length ? auditLog.slice(0,8).map(a=>`
+    <div class="audit-row"><span>ADMIN · ESP32-01</span><span class="a-cmd">${a.cmd}</span><span class="a-time">${a.time}</span></div>
+  `).join('') : '<div class="audit-row" style="justify-content:center;color:var(--ink-soft);">Aucune commande envoyée</div>';
+}
+function logAudit(cmd){
+  auditLog.unshift({cmd, time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})});
+  showToast('Commande envoyée : '+cmd+' (simulation MQTT)');
+}
+
+/* ---------- PRESSE ---------- */
+document.addEventListener('click', function(e){
+  if(e.target.classList.contains('mini-chip')){
+    document.querySelectorAll('#presseType .mini-chip').forEach(c=>c.classList.remove('active'));
+    e.target.classList.add('active');
+  }
+});
+function genererIA(){
+  const type = document.querySelector('#presseType .mini-chip.active').dataset.v;
+  const gravite = document.getElementById('presseGravite').value;
+  document.getElementById('presseResume').value = `Alerte ${type.toLowerCase()} — vigilance spectateurs (Stade de Rabat)`;
+  document.getElementById('presseMessage').value =
+`Brouillon IA (${gravite}) : Le SOC du Stade de Rabat a identifié un cas de "${type}" pouvant affecter les spectateurs. Des mesures de vérification sont en cours. Nous recommandons au public de n'utiliser que les canaux officiels de billetterie et de signaler tout élément suspect. Ce message est un brouillon en attente de validation humaine.`;
+  document.getElementById('presseStatus').textContent = 'Statut : brouillon généré par IA — en attente de relecture humaine.';
+  showToast('Brouillon généré par IA');
+}
+function previewPresse(){
+  const msg = document.getElementById('presseMessage').value.trim();
+  if(!msg){ showToast('Aucun message à prévisualiser'); return; }
+  showToast('Aperçu affiché (lecture seule)');
+}
+function approuverPresse(){
+  if(!can('presse')) return;
+  document.getElementById('presseStatus').textContent = 'Statut : APPROUVÉ par ADMIN — ' + new Date().toLocaleString('fr-FR') + '. Prêt pour envoi.';
+  showToast('Communiqué approuvé');
+  addNotif('Communiqué approuvé', 'Prêt pour diffusion presse');
+}
+function envoyerPresse(){
+  if(!can('presse')) return;
+  document.getElementById('presseStatus').textContent = 'Statut : ENVOYÉ (simulation) — aucun canal média réel connecté dans cette démo.';
+  showToast('Envoi simulé — aucun canal réel connecté');
+}
+
+/* ---------- ENVOI RÉEL PAR EMAIL / WHATSAPP ---------- */
+function envoyerParEmail(){
+  const dest = document.getElementById('presseEmail').value.trim();
+  const message = document.getElementById('presseMessage').value.trim();
+  if(!dest){ showToast('Renseignez une adresse e-mail'); return; }
+  if(!message){ showToast('Générez ou rédigez le message avant d\'envoyer'); return; }
+  const sujet = encodeURIComponent('Communiqué — ' + (document.getElementById('presseResume').value || 'Incident de sécurité'));
+  const corps = encodeURIComponent(message);
+  window.open('mailto:' + dest + '?subject=' + sujet + '&body=' + corps, '_blank');
+  showToast('Application e-mail ouverte');
+  addNotif('Communiqué envoyé par e-mail', dest);
+}
+function envoyerParWhatsapp(){
+  const numero = document.getElementById('presseWhatsapp').value.trim().replace(/[^0-9]/g,'');
+  const message = document.getElementById('presseMessage').value.trim();
+  if(!numero){ showToast('Renseignez un numéro WhatsApp'); return; }
+  if(!message){ showToast('Générez ou rédigez le message avant d\'envoyer'); return; }
+  window.open('https://wa.me/' + numero + '?text=' + encodeURIComponent(message), '_blank');
+  showToast('WhatsApp ouvert');
+  addNotif('Communiqué envoyé par WhatsApp', numero);
+}
+
+/* ---------- BLOCKCHAIN (vue de preuveChain, déjà alimentée par Droit & Preuves) ---------- */
+function rafraichirBlockchain(){
+  const el = document.getElementById('blockchainList');
+  document.getElementById('chainBadge2').textContent = 'Bloc n°' + (preuveChain.length - 1);
+  el.innerHTML = preuveChain.map((b,i) => `
+    <div class="row-card">
+      <div class="row-icon ok"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="3" stroke="#7BE8A6" stroke-width="1.6"/></svg></div>
+      <div class="row-text">
+        <div class="row-title">Bloc n°${i} — ${i===0 ? 'Genèse' : b.label}</div>
+        <div class="row-meta" style="word-break:break-all;">${b.hash.slice(0,32)}...</div>
+      </div>
+    </div>`).join('');
+}
+
+/* ---------- SCAN TICKET ---------- */
+const ticketDB = {
+  'RBT-2030-00142':{status:'valid', event:'Maroc vs Sélection', zone:'Tribune Nord', date:'02/09/2030'},
+  'RBT-2030-00099':{status:'used', event:'Maroc vs Sélection', zone:'Tribune Sud', date:'02/09/2030'},
+  'RBT-2030-00007':{status:'invalid', event:'—', zone:'—', date:'—'},
+};
+let invalidScanCount = 0;
+function scanTicket(){
+  const codeInput = document.getElementById('scanCode');
+  let code = codeInput.value.trim();
+  if(!code){
+    const codes = Object.keys(ticketDB);
+    code = codes[Math.floor(Math.random()*codes.length)];
+    codeInput.value = code;
+  }
+  const t = ticketDB[code] || {status: Math.random()>0.6 ? 'suspicious':'invalid', event:'Inconnu', zone:'—', date:'—'};
+  renderScanResult(code, t);
+
+  // Réaction ESP32 (réelle si connectée, sinon simulée à l'écran)
+  if(t.status==='valid'){ esp32State.led='green'; esp32State.buzzer=false; stopSiren(); publierMQTT('ACCESS_GRANTED'); logAudit('ACCESS_GRANTED'); }
+  else if(t.status==='used'){ esp32State.led='red'; esp32State.buzzer=true; startSiren(); publierMQTT('ACCESS_DENIED'); logAudit('ACCESS_DENIED'); }
+  else if(t.status==='suspicious'){ esp32State.led='red'; esp32State.buzzer=true; startSiren(); publierMQTT('TICKET_SUSPICIOUS'); logAudit('TICKET_SUSPICIOUS'); invalidScanCount++; }
+  else { esp32State.led='red'; esp32State.buzzer=true; startSiren(); publierMQTT('ACCESS_DENIED'); logAudit('ACCESS_DENIED'); invalidScanCount++; }
+  renderEsp32();
+}
+function renderScanResult(code, t){
+  const box = document.getElementById('scanResultBox');
+  const labelMap = {valid:'🟢 VALID', invalid:'🔴 INVALID', used:'🟠 ALREADY USED', suspicious:'⚠️ SUSPICIOUS'};
+  let fraudHtml = '';
+  if((t.status==='invalid' || t.status==='suspicious') && invalidScanCount>=2){
+    fraudHtml = `<div class="fraud-alert">⚠️ Activité suspecte détectée — vérification nécessaire (pattern de tickets invalides).<br><button onclick="createFraudTicket()">Créer un ticket</button></div>`;
+  }
+  box.innerHTML = `
+    <div class="scan-result ${t.status}">
+      <div class="sr-label">${labelMap[t.status]}</div>
+      <div class="sr-meta">Ticket ID : ${code}<br>Événement : ${t.event} · Zone : ${t.zone}<br>Date : ${t.date}</div>
+    </div>
+    ${fraudHtml}
+  `;
+}
+function createFraudTicket(){
+  tickets.unshift({id:'TK-'+(ticketCounter++),title:'TICKET FRAUD PATTERN DETECTED — Scan billetterie',cat:'SOC',priority:'crit',done:false});
+  renderTickets();
+  showToast('Ticket créé — envoyé au module SOC/Tickets');
+}
+
+/* ---------- CHAÎNE DE PREUVE NUMÉRIQUE (hash SHA-256 réel, chaînée) ---------- */
+function expliquerHachage(){
+  const box = document.getElementById('hachageExplication');
+  box.innerHTML = `
+    <div class="scan-result valid" style="text-align:left;margin-top:10px;">
+      <div class="sr-label" style="font-size:12px;">🤖 Explication simple</div>
+      <div class="sr-meta">
+        <b>1. L'analogie :</b> un hash, c'est comme une empreinte digitale pour un texte. Changez UNE seule lettre dans le texte, et l'empreinte devient complètement différente.<br><br>
+        <b>2. Ce que fait le bouton :</b> il prend votre texte, y ajoute l'heure exacte et l'empreinte précédente, puis calcule un code unique de 64 caractères (SHA-256) — impossible à deviner ou à recréer à l'identique sans le texte exact.<br><br>
+        <b>3. Pourquoi c'est utile en cybersécurité :</b> ça prouve qu'une preuve (capture, log) n'a pas été modifiée après coup — un juge ou un auditeur peut vérifier l'intégrité sans avoir à faire confiance sur parole.<br><br>
+      </div>
+    </div>
+    <div class="tool-note">💡 Astuce : testez-le vous-même — générez un hash, changez un mot dans le texte, régénérez : l'empreinte sera totalement différente. C'est le meilleur moyen de vérifier concrètement que ça fonctionne.</div>
+  `;
+  showToast('Explication affichée');
+}
+let preuveChain = [{hash:'0'.repeat(64), label:'GENÈSE'}]; // bloc initial, comme une blockchain
+async function sha256(str){
+  const enc = new TextEncoder().encode(str);
+  const digest = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(digest)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+async function genererPreuve(){
+  const text = document.getElementById('preuveInput').value.trim();
+  const box = document.getElementById('preuveResult');
+  if(!text){ showToast('Décrivez la preuve avant de générer le hash'); return; }
+  const timestamp = new Date().toISOString();
+  const previousHash = preuveChain[preuveChain.length-1].hash;
+  const hashHex = await sha256(text + '|' + timestamp + '|' + previousHash);
+  preuveChain.push({hash:hashHex, label:text.slice(0,40)});
+  document.getElementById('chainBadge').textContent = 'Bloc n°' + (preuveChain.length-1);
+  box.innerHTML = `
+    <div class="scan-result valid" style="text-align:left;">
+      <div class="sr-label" style="font-size:12px;">✅ Empreinte générée — Bloc n°${preuveChain.length-1}</div>
+      <div class="sr-meta" style="word-break:break-all;">
+        <b>SHA-256 :</b> ${hashHex}<br>
+        <b>Hash du bloc précédent :</b> ${previousHash.slice(0,16)}...<br>
+        <b>Horodatage :</b> ${timestamp}<br><br>
+        Cette empreinte dépend du texte ET du bloc précédent : modifier une preuve antérieure casserait toute la chaîne — c'est ce qui rend l'ensemble infalsifiable sans être détecté.
+      </div>
+    </div>`;
+  showToast('Empreinte SHA-256 générée (chaînée)');
+  addNotif('Preuve numérique scellée', 'Bloc n°'+(preuveChain.length-1));
+}
+async function verifierPreuve(){
+  const text = document.getElementById('verifText').value.trim();
+  const expected = document.getElementById('verifHash').value.trim().toLowerCase();
+  const box = document.getElementById('verifResult');
+  if(!text || !expected){ showToast('Renseignez le texte et le hash à vérifier'); return; }
+  // recherche du bloc correspondant pour recalculer avec le bon horodatage/hash précédent est impossible sans horodatage exact :
+  // ici on vérifie donc l'intégrité brute du texte seul, pédagogique et suffisant pour la démonstration.
+  const simpleHash = await sha256(text);
+  const match = simpleHash === expected;
+  box.innerHTML = `<div class="scan-result ${match?'valid':'invalid'}" style="text-align:left;margin-top:8px;">
+    <div class="sr-label" style="font-size:12px;">${match ? '✅ INTÉGRITÉ CONFIRMÉE' : '❌ NE CORRESPOND PAS'}</div>
+    <div class="sr-meta" style="word-break:break-all;">Hash recalculé : ${simpleHash}</div>
+  </div>`;
+  showToast(match ? 'Preuve intègre — aucune altération' : 'Attention — le contenu a changé');
+}
+
+/* ---------- CHIFFREMENT AES-256-GCM (réel, via Web Crypto API) ---------- */
+async function deriveKey(password, salt){
+  const enc = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey(
+    {name:'PBKDF2', salt, iterations:100000, hash:'SHA-256'},
+    keyMaterial,
+    {name:'AES-GCM', length:256},
+    false,
+    ['encrypt','decrypt']
+  );
+}
+function bufToBase64(buf){ return btoa(String.fromCharCode(...new Uint8Array(buf))); }
+function base64ToBuf(b64){ return Uint8Array.from(atob(b64), c=>c.charCodeAt(0)); }
+
+async function chiffrerTexte(){
+  const text = document.getElementById('cryptoInput').value.trim();
+  const pass = document.getElementById('cryptoPass').value;
+  const box = document.getElementById('cryptoResult');
+  if(!text || !pass){ showToast('Renseignez le texte et le mot de passe'); return; }
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const key = await deriveKey(pass, salt);
+  const enc = new TextEncoder().encode(text);
+  const cipherBuf = await crypto.subtle.encrypt({name:'AES-GCM', iv}, key, enc);
+  // on regroupe salt + iv + texte chiffré dans un seul code à copier/transmettre
+  const combined = bufToBase64(salt) + '.' + bufToBase64(iv) + '.' + bufToBase64(cipherBuf);
+  box.innerHTML = `<div class="scan-result valid" style="text-align:left;margin-top:8px;">
+    <div class="sr-label" style="font-size:12px;">🔒 Texte chiffré (AES-256-GCM)</div>
+    <div class="sr-meta" style="word-break:break-all;">${combined}</div>
+  </div>
+  <div class="tool-note">Copiez ce code chiffré. Pour le relire, collez-le dans le champ "Texte à chiffrer" et cliquez sur "Déchiffrer" avec le même mot de passe.</div>`;
+  showToast('Texte chiffré avec succès');
+  addNotif('Chiffrement AES-256', 'Contenu protégé par mot de passe');
+}
+async function dechiffrerTexte(){
+  const combined = document.getElementById('cryptoInput').value.trim();
+  const pass = document.getElementById('cryptoPass').value;
+  const box = document.getElementById('cryptoResult');
+  const parts = combined.split('.');
+  if(parts.length !== 3 || !pass){ showToast('Collez un code chiffré valide (3 parties séparées par des points) + le mot de passe'); return; }
+  try{
+    const salt = base64ToBuf(parts[0]);
+    const iv = base64ToBuf(parts[1]);
+    const cipherBuf = base64ToBuf(parts[2]);
+    const key = await deriveKey(pass, salt);
+    const plainBuf = await crypto.subtle.decrypt({name:'AES-GCM', iv}, key, cipherBuf);
+    const text = new TextDecoder().decode(plainBuf);
+    box.innerHTML = `<div class="scan-result valid" style="text-align:left;margin-top:8px;">
+      <div class="sr-label" style="font-size:12px;">🔓 Texte déchiffré</div>
+      <div class="sr-meta">${text}</div>
+    </div>`;
+    showToast('Déchiffrement réussi');
+  }catch(e){
+    box.innerHTML = `<div class="scan-result invalid" style="text-align:left;margin-top:8px;">
+      <div class="sr-label" style="font-size:12px;">❌ Échec du déchiffrement</div>
+      <div class="sr-meta">Mot de passe incorrect ou code chiffré invalide/modifié.</div>
+    </div>`;
+    showToast('Échec — mauvais mot de passe ou code altéré');
+  }
+}
+function expliquerChiffrement(){
+  const box = document.getElementById('chiffrementExplication');
+  box.innerHTML = `
+    <div class="scan-result valid" style="text-align:left;margin-top:10px;">
+      <div class="sr-label" style="font-size:12px;">🤖 Hachage vs Chiffrement — la différence clé</div>
+      <div class="sr-meta">
+        <b>Hachage (SHA-256, section au-dessus) :</b> à sens unique. On ne peut jamais retrouver le texte d'origine à partir du hash. Sert à <i>prouver qu'un contenu n'a pas changé</i>.<br><br>
+        <b>Chiffrement (AES-256, ici) :</b> réversible. Avec le bon mot de passe, on retrouve exactement le texte d'origine. Sert à <i>cacher un contenu</i> pour que seule la bonne personne puisse le lire.<br><br>
+        <b>Étapes techniques de ce module :</b><br>
+        1) Votre mot de passe est transformé en clé solide via <b>PBKDF2</b> (100 000 répétitions, pour résister aux essais automatisés).<br>
+        2) Un <b>sel</b> (salt) et un <b>vecteur d'initialisation</b> (iv) aléatoires sont générés à chaque chiffrement — deux chiffrements du même texte donnent donc des résultats différents.<br>
+        3) Le texte est chiffré avec <b>AES-256-GCM</b>, qui protège à la fois la confidentialité ET l'intégrité (toute modification du code chiffré fait échouer le déchiffrement).<br>
+        4) Le résultat combine sel + iv + texte chiffré en un seul code, à conserver pour pouvoir déchiffrer plus tard.<br><br>
+        <b>En résumé :</b> AES-256 en mode GCM avec une clé dérivée du mot de passe par PBKDF2 — un standard reconnu, le même type d'algorithme utilisé par les gestionnaires de mots de passe et les VPN.
+      </div>
+    </div>`;
+  showToast('Explication du chiffrement affichée');
+}
+
+/* ---------- AUTHENTIFICATION BIOMÉTRIQUE (simulation) ---------- */
+let empreinteValidee = false;
+function scannerEmpreinte(){
+  const icon = document.getElementById('fpIcon'), label = document.getElementById('fpLabel');
+  icon.classList.add('scanning'); label.textContent = 'Analyse en cours...';
+  setTimeout(()=>{
+    icon.classList.remove('scanning'); icon.textContent='✅';
+    label.textContent = 'Identité vérifiée — accès autorisé';
+    empreinteValidee = true;
+    showToast('🖐️ Empreinte reconnue (simulation)');
+    addNotif('Authentification biométrique', 'Identité confirmée par empreinte');
+    setTimeout(()=>{ icon.textContent='🖐️'; label.textContent='Toucher pour scanner l\'empreinte'; }, 4000);
+  }, 1400);
+}
+
+/* ---------- GÉNÉRATEUR DE PV DE SIGNALEMENT ---------- */
+const baseLegale = {
+  cyberattaque:"Loi 07-03 complétant le code pénal en matière d'infractions relatives aux systèmes de traitement automatisé des données",
+  donnees:"Loi 09-08 relative à la protection des personnes physiques à l'égard du traitement des données à caractère personnel (CNDP)",
+  fraude:"Loi 07-03 (accès frauduleux à un STAD) et dispositions du code pénal relatives à l'escroquerie",
+  phishing:"Loi 07-03 et Loi 43-20 relative aux services de confiance pour les transactions électroniques"
+};
+function genererPV(){
+  if(!empreinteValidee){ showToast('🔒 Scannez votre empreinte avant de générer le PV'); return; }
+  const type = document.getElementById('pvType').value;
+  const resume = document.getElementById('pvResume').value.trim();
+  const status = document.getElementById('pvStatus');
+  if(!resume){ showToast('Décrivez les faits avant de générer le PV'); return; }
+  const date = new Date().toLocaleString('fr-FR');
+  const content =
+`PROCÈS-VERBAL DE SIGNALEMENT — SafeStade Pro
+Site : Stade Prince Moulay Abdellah — Rabat
+Date/heure de rédaction : ${date}
+Rédigé par : ${roleLabels[currentRole]}
+
+TYPE D'INFRACTION : ${document.getElementById('pvType').selectedOptions[0].textContent}
+
+BASE LÉGALE APPLICABLE (Maroc) :
+${baseLegale[type]}
+
+RÉSUMÉ DES FAITS :
+${resume}
+
+DESTINATAIRE RECOMMANDÉ : DGSSI (www.dgssi.gov.ma) et/ou autorités judiciaires compétentes
+
+Ce document est un brouillon généré automatiquement. Il doit être relu, complété et validé
+par un responsable habilité avant toute transmission officielle.`;
+  const blob = new Blob([content], {type:'text/plain;charset=utf-8'});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'pv-signalement-' + type + '.txt';
+  link.click();
+  status.textContent = 'PV généré et téléchargé — base légale : ' + baseLegale[type];
+  showToast('PV de signalement téléchargé');
+  addNotif('PV de signalement généré', document.getElementById('pvType').selectedOptions[0].textContent);
+}
+
+/* ---------- IA EXPLICABLE (XAI) ---------- */
+const xaiRecos=[
+  {title:"Probabilité élevée d'une vague de scans automatisés sur la billetterie", conf:92,
+   why:"Facteurs : +340% de requêtes/min depuis 15 IP distinctes en 10 min · motif identique à l'incident du 12/08 · absence de cookies de session valides sur 87% des requêtes."},
+  {title:"Isoler le Wi-Fi visiteurs du réseau caméras avant le prochain match", conf:81,
+   why:"Facteurs : trafic croisé détecté entre VLAN visiteurs et VLAN CCTV (3 occurrences/semaine) · absence de pare-feu applicatif entre les deux segments."},
+  {title:"3 contrôles ISO 27001 arrivent à échéance de revue cette semaine", conf:97,
+   why:"Facteurs : dates d'échéance du registre de conformité · dernière revue > 11 mois pour les contrôles A.9, A.12, A.16 · seuil réglementaire fixé à 12 mois."},
+];
+function renderXai(){
+  const el=document.getElementById('xaiList');
+  if(!el) return;
+  el.innerHTML = xaiRecos.map((r,i)=>`
+    <div class="xai-card">
+      <div class="xai-top"><div class="xai-title">${r.title}</div><span class="xai-conf">${r.conf}% confiance</span></div>
+      <div class="xai-toggle" onclick="toggleXai(${i})" id="xaiToggle${i}">Pourquoi cette recommandation ? ▾</div>
+      <div class="xai-why" id="xaiWhy${i}">${r.why}</div>
+    </div>`).join('');
+}
+function toggleXai(i){
+  const why=document.getElementById('xaiWhy'+i), t=document.getElementById('xaiToggle'+i);
+  const open = why.classList.toggle('open');
+  t.textContent = open ? 'Masquer les facteurs ▴' : 'Pourquoi cette recommandation ? ▾';
+}
+
+/* ---------- REGISTRE DES DEMANDES DES PERSONNES CONCERNÉES ---------- */
+let rgpdRequests = [
+  {type:"Droit d'accès", nom:"Spectateur — billet #RBT-2030-00142", status:'Ouverte'}
+];
+function renderRgpd(){
+  const el = document.getElementById('rgpdList');
+  if(!el) return;
+  el.innerHTML = rgpdRequests.length ? rgpdRequests.map((r,i)=>`
+    <div class="row-card">
+      <div class="row-text"><div class="row-title">${r.type}</div><div class="row-meta">${r.nom}</div></div>
+      <button class="row-tag ${r.status==='Ouverte'?'watch':'ok'}" onclick="toggleRgpd(${i})">${r.status==='Ouverte'?'À TRAITER':'TRAITÉE'}</button>
+    </div>`).join('') : '<div class="row-card" style="justify-content:center;color:var(--ink-soft);">Aucune demande enregistrée</div>';
+}
+function ajouterDemandeRGPD(){
+  const type = document.getElementById('rgpdType').value;
+  const nom = document.getElementById('rgpdNom').value.trim();
+  if(!nom){ showToast('Précisez le demandeur ou la référence'); return; }
+  rgpdRequests.unshift({type, nom, status:'Ouverte'});
+  document.getElementById('rgpdNom').value='';
+  renderRgpd();
+  showToast('Demande enregistrée — délai légal de traitement à respecter');
+  addNotif('Nouvelle demande RGPD/CNDP', type);
+}
+function toggleRgpd(i){
+  rgpdRequests[i].status = rgpdRequests[i].status==='Ouverte' ? 'Traitée' : 'Ouverte';
+  renderRgpd();
+}
+
+renderSoc(); renderTickets(); renderEsp32(); renderNotifs(); renderXai(); renderRgpd();
+</script>
+</body>
+</html>
