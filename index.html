@@ -889,8 +889,8 @@ async function sendToAbaFusion(payload){
   if(!abaWebhookUrl) return false;
   const data = Object.assign({}, payload, {site:'Stade Prince Moulay Abdellah — Rabat', siteId:'stade-prince-moulay-abdellah-rabat', horodatage:new Date().toISOString()});
   try{
-    // mode "no-cors" : évite le blocage CORS du navigateur pour un appel simple depuis le front.
-    await fetch(abaWebhookUrl, {method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data), signal: AbortSignal.timeout(20000)});
+    // mode "no-cors" : evite le blocage CORS. Pas de timeout court : on laisse le temps a AbaFusion de repondre.
+    await fetch(abaWebhookUrl, {method:'POST', mode:'no-cors', body:JSON.stringify(data)});
     showToast('Donnée transmise à AbaFusion');
     return true;
   }catch(e){
@@ -898,7 +898,6 @@ async function sendToAbaFusion(payload){
     return false;
   }
 }
-
 /* ---------- ESP32 ---------- */
 let esp32State = {led:'off', buzzer:false, alert:false};
 let auditLog = [];
