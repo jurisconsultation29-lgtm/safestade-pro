@@ -890,7 +890,7 @@ async function sendToAbaFusion(payload){
   const data = Object.assign({}, payload, {site:'Stade Prince Moulay Abdellah — Rabat', siteId:'stade-prince-moulay-abdellah-rabat', horodatage:new Date().toISOString()});
   try{
     // mode "no-cors" : évite le blocage CORS du navigateur pour un appel simple depuis le front.
-    await fetch(abaWebhookUrl, {method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data), signal: AbortSignal.timeout(6000)});
+    await fetch(abaWebhookUrl, {method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data), signal: AbortSignal.timeout(20000)});
     showToast('Donnée transmise à AbaFusion');
     return true;
   }catch(e){
